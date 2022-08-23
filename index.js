@@ -1,28 +1,38 @@
+//Environmental variables
+require('dotenv').config()
+
+//Express
 const express = require('express')
 const app = express()
-const server = require('http').createServer(app);
-const WebSocket = require('ws');
+const cors = require('cors')
+app.use(cors())
+app.use(express.json());
 
+//Options needed so the browser doesn't get mad and refuse to send the request
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+
+//Server for both websocket and API
+const server = require('http').createServer(app);
 const port = 3001
 
+//Websocket
+const WebSocket = require('ws');
 const wss = new WebSocket.Server({ server:server });
 
-wss.on('connection', function connection(ws) {
-  console.log('A new client Connected!');
-  ws.send('Welcome New Client!');
+const handle_wss =  require('./websocket')
+handle_wss(wss)
 
-  ws.on('message', function incoming(message) {
-    console.log('received: %s', message);
+//API
+const roomsRouter = require('./routes/rooms')
+app.use('/rooms', roomsRouter)
 
-    wss.clients.forEach(function each(client) {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
-    
-  });
-});
-
-app.get('/', (req, res) => res.send('Hello World!'))
+//For testing
+app.get('/test', cors(corsOptions), (req, res) => {
+  console.log('Hello')
+  res.status(200).send('Hello World!')
+})
 
 server.listen(port, () => console.log(`Lisening on port ${port}`))
