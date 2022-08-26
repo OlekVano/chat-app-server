@@ -4,7 +4,7 @@ const router = express.Router()
 const db = require('../db_connection')
 const { validateRoom } = require('../utils')
 
-router.post('/', async (req, res) => {
+router.post('/create', async (req, res) => {
   try {
     const salt = randomBytes(16).toString('hex');
     const hashedPassword = scryptSync(req.body.password, salt, 64).toString('hex');
@@ -24,13 +24,13 @@ router.post('/', async (req, res) => {
   }
 })
 
-router.get('/', async (req, res) => {
+router.post('/verify', async (req, res) => {
   try {
     var valid_ids = []
     for (var i = 0; i < req.body.rooms.length; i++) {
       const room = req.body.rooms[i]
       if (await validateRoom(room)) {
-        valid_ids.push(room._id)
+        valid_ids.push(room.id)
       }
     }
     res.status(200).json(valid_ids)
