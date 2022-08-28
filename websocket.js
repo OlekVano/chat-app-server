@@ -13,7 +13,6 @@ const handle_wss = (wss) => {
 
 const handleClientConnection = (client) => {
 	console.log('A new client Connected!')
-  client.send('Welcome New Client!')
 
 	handleMessage(client)
 }
@@ -22,9 +21,8 @@ const handleMessage = (client) => {
 	client.on('message', async (msg) => {
 		try {
 			const json = JSON.parse(msg)
-			console.log(json)
 			if ('rooms' in json) {
-				var res = []
+				console.log('Join')
 				for (var i = 0; i < json.rooms.length; i++) {
 					if (await validateRoom(json.rooms[i])) {
 						const id = json.rooms[i].id
@@ -39,9 +37,15 @@ const handleMessage = (client) => {
 				}
 			}
 			if ('message' in json) {
-				if (await validateRoom(json.message.room)) {
-					for (var i = 0; i < rooms[json.room._id].clients.length; i++) {
-						rooms[json.room._id].clients[i].send()
+				console.log('Message')
+				if (await validateRoom(json)) {
+					for (var i = 0; i < rooms[json.id].clients.length; i++) {
+						console.log('send')
+						rooms[json.id].clients[i].send(JSON.stringify({
+							from: json.from,
+							message: json.message,
+							id: json.id
+						}))
 					}
 				}
 			}
@@ -49,8 +53,6 @@ const handleMessage = (client) => {
 		catch (err) {
 			console.log(`Error: ${err}`)
 		}
-
-		console.log(rooms)
 		
 		/*if (message.split(' ')[0] === 'Access')
 		wss.clients.forEach(function each(client) {
@@ -59,10 +61,6 @@ const handleMessage = (client) => {
 			}
 		});*/
 	});
-}
-
-const connect = () => {
-
 }
 
 module.exports = handle_wss
