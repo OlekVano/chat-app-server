@@ -38,6 +38,16 @@ const handleMessage = async (msg, client) => {
         }
       })
     }
+    else if (json.action === 'roomsLeave') {
+      console.log('Leave')
+      json.rooms.forEach((room) => {
+        if (!room.id in rooms) return
+        rooms[room.id].clients = rooms[room.id].clients.filter(_client => _client !== client)
+        if (rooms[room.id].clients.length === 0) {
+          delete rooms[room.id]
+        }
+      })
+    }
     else if (json.action === 'messageSend') {
       console.log('Message')
       if (!await validateRoom(json)) return
@@ -53,6 +63,7 @@ const handleMessage = async (msg, client) => {
     else {
       console.log(`Invalid action: ${json.action}`)
     }
+    console.log(rooms)
   }
   catch (err) {
     console.log(`Error: ${err}`)
