@@ -10,13 +10,13 @@ app.use(express.json());
 
 //Options needed so the browser doesn't get mad and refuse to send the request
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  //origin: 'http://localhost:3000',
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 
 //Server for both websocket and API
 const server = require('http').createServer(app);
-const port = 3001
+const port = process.env.PORT || 3001
 
 //Websocket
 const WebSocket = require('ws');
