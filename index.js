@@ -16,7 +16,7 @@ const corsOptions = {
 
 //Server for both websocket and API
 const server = require('http').createServer(app);
-const port = process.env.PORT || 3001
+const port = process.env.PORT
 
 //Websocket
 const WebSocket = require('ws');
